@@ -1,42 +1,144 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-# coding: utf-8
+"""The setup script."""
 
-"""
-Setup script for installing fastai
-"""
+import re
+from setuptools import setup, find_packages
 
-##########################################################################
-## Imports
-##########################################################################
+# note: version is maintained inside fastai/version.py
+exec(open('fastai/version.py').read())
 
-#from distutils.core import setup
-from setuptools import setup
+with open('README.md') as readme_file: readme = readme_file.read()
 
+# helper functions to make it easier to list dependencies not as a python list, but vertically w/ optional built-in comments to why a certain version of the dependency is listed
+def cleanup(x): return re.sub(r' *#.*', '', x.strip()) # comments
+def to_list(buffer): return list(filter(None, map(cleanup, buffer.splitlines())))
 
-##########################################################################
-## Setup
-##########################################################################
+### normal dependencies ###
+#
+# these get resolved and installed via either of these two:
+#
+#   pip install fastai
+#   pip install -e .
+#
+# dependencies to skip for now:
+# - cupy - is only required for QRNNs - sgugger thinks later he will get rid of this dep.
+#
+# IMPORTANT: when updating these, please make sure to sync conda/meta.yaml and docs/install.md (the "custom dependencies" section)
+requirements = to_list("""
+    bottleneck           # performance-improvement for numpy
+    dataclasses ; python_version<'3.7'
+    fastprogress>=0.1.18
+    beautifulsoup4
+    matplotlib
+    numexpr              # performance-improvement for numpy
+    numpy>=1.12
+    nvidia-ml-py3
+    pandas
+    packaging
+    Pillow
+    pyyaml
+    requests
+    scipy
+    spacy>=2.0.18
+    torch>=1.0.0
+    torchvision
+    typing
+""")
 
+### developer dependencies ###
+#
+# anything else that's not required by a user to run the library, but
+# either is an enhancement or a developer-build requirement goes here.
+#
+# the [dev] feature is documented here:
+# https://setuptools.readthedocs.io/en/latest/setuptools.html#declaring-extras-optional-features-with-their-own-dependencies
+#
+# these, including the normal dependencies, get installed with:
+#
+#   pip install "fastai[dev]"
+#
+# or via an editable install:
+#
+#   pip install -e ".[dev]"
+#
+# some of the listed modules appear in test_requirements as well, as explained below.
+#
+dev_requirements = { 'dev' : to_list("""
+    coverage
+    distro
+    ipython
+    jupyter
+    jupyter_contrib_nbextensions
+    nbconvert>=5.4
+    nbdime                       # help with nb diff/merge
+    nbformat
+    notebook>=5.7.0
+    pip>=9.0.1
+    pipreqs>=0.4.9
+    pytest
+    responses                    # for requests testing
+    traitlets
+    wheel>=0.30.0
+""") }
+
+### setup dependencies ###
+# need at least setuptools>=36.2 to support syntax:
+#   dataclasses ; python_version<'3.7'
+setup_requirements = to_list("""
+    pytest-runner
+    setuptools>=36.2
+""")
+
+# notes:
+#
+# * these deps will be installed locally under .eggs/ and will not be
+#   visible to pytest unless it's invoked via `python setup test`.
+#   Therefore it's the best to install them explicitly with:
+#   pip install -e .[dev]
+#
+### test dependencies ###
+test_requirements = to_list("""
+    pytest
+""")
+
+# list of classifiers: https://pypi.org/pypi?%3Aaction=list_classifiers
 setup(
-    name = "fastai",
-    packages = ['fastai', 'fastai/models', 'fastai/models/cifar10'],
-    version = 0.6 ,
-    description = "The fast.ai deep learning and machine learning library. Git pull fastai, for all fast.ai sessions and tutorials also",
-    author = "Jeremy Howard and contributors",
-    author_email = "info@fast.ai",
-    license = "Apache License 2.0",
-    url = "https://github.com/fastai/fastai",
-    download_url =  'https://github.com/fastai/fastai/archive/0.6.tar.gz',
-    install_requires =
-     ['awscli', 'bcolz', 'bleach', 'certifi', 'cycler', 'decorator', 'entrypoints', 'feather-format', 'graphviz', 'html5lib',
-      'ipykernel', 'ipython', 'ipython-genutils', 'ipywidgets', 'isoweek', 'jedi', 'Jinja2', 'jsonschema', 'jupyter',
-      'jupyter-client', 'jupyter-console', 'jupyter_contrib_nbextensions', 'jupyter-core', 'kaggle-cli', 'MarkupSafe',
-      'matplotlib', 'mistune', 'nbconvert', 'nbformat', 'notebook', 'numpy', 'olefile', 'opencv-python', 'pandas',
-      'pandas_summary', 'pandocfilters', 'pexpect', 'pickleshare', 'Pillow', 'plotnine', 'prompt-toolkit',
-      'ptyprocess', 'Pygments', 'pyparsing', 'python-dateutil', 'pytz', 'PyYAML', 'pyzmq', 'qtconsole', 'scipy',
-      'seaborn', 'simplegeneric', 'six', 'sklearn_pandas', 'terminado', 'testpath', 'torchtext', 'tornado', 'tqdm',
-      'traitlets', 'wcwidth', 'webencodings', 'widgetsnbextension'],
-    keywords = ['deeplearning', 'pytorch', 'machinelearning'],
-    classifiers = ['Development Status :: 3 - Alpha', 'Programming Language :: Python', 'Programming Language :: Python :: 3.6']
-)
+    name = 'fastai',
+    version = __version__,
 
+    packages = find_packages(),
+    include_package_data = True,
+
+    install_requires = requirements,
+    setup_requires   = setup_requirements,
+    extras_require   = dev_requirements,
+    tests_require    = test_requirements,
+    python_requires  = '>=3.6',
+
+    test_suite = 'tests',
+
+    description = "fastai makes deep learning with PyTorch faster, more accurate, and easier",
+    long_description = readme,
+    long_description_content_type = 'text/markdown',
+    keywords = 'fastai, deep learning, machine learning',
+
+    license = "Apache Software License 2.0",
+
+    url = 'https://github.com/fastai/fastai',
+
+    author = "Jeremy Howard",
+    author_email = 'info@fast.ai',
+
+    classifiers = [
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+    ],
+
+    zip_safe = False,
+)

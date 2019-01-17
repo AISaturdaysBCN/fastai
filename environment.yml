@@ -1,3 +1,6 @@
+# use/edit this file only for working with fastai-0.7.x version
+# for fastai-1.0+ edit "setup.py" and use "pip install -e ."
+# or "pip install -e .[dev]" for extra developer requirements
 name: fastai
 channels:
 - fastai
@@ -22,15 +25,12 @@ dependencies:
 - decorator
 - entrypoints
 - expat
-  #- fontconfig
-  #- glib
 - html5lib
 - icu
 - ipykernel
 - ipython
 - ipython_genutils
 - ipywidgets
-  #- jbig
 - jedi
 - jinja2
 - jsonschema
@@ -38,9 +38,7 @@ dependencies:
 - jupyter_client
 - jupyter_console
 - jupyter_core
-  #- libffi
-  #- libgcc
-  #- libgfortran
+#- conda-forge::jupyter_contrib_nbextensions
 - libiconv
 - libpng
 - libsodium
@@ -49,7 +47,6 @@ dependencies:
 - matplotlib
 - mistune
 - mkl
-- nbconvert
 - nbformat
 - notebook
 - numpy
@@ -65,7 +62,6 @@ dependencies:
 - pillow
 - pip
 - prompt_toolkit
-  #- ptyprocess
 - pycparser
 - pygments
 - pyparsing
@@ -76,7 +72,6 @@ dependencies:
 - pyzmq
 - qt
 - qtconsole
-  #- readline
 - scipy
 - seaborn
 - setuptools
@@ -85,8 +80,8 @@ dependencies:
 - six
 - sqlite
 - statsmodels
-  #- terminado
-- testpath
+- testfixtures
+- testpath>=0.4.2
 - tk
 - tornado<5
 - tqdm
@@ -99,21 +94,19 @@ dependencies:
 - pytorch<0.4
 - bcolz
 - prompt_toolkit
-- pytest
+#- pytest
+- cython
 - pip:
-  - torchvision>=0.1.9
+  - torchvision==0.1.9
   - opencv-python
   - isoweek
-  - pandas_summary
-  - torchtext
+  - pandas_summary==0.0.5
+  - torchtext==0.2.3
   - graphviz
   - sklearn_pandas
   - feather-format
-  - jupyter_contrib_nbextensions
-  - plotnine
-  - awscli
+#  - plotnine
   - kaggle-cli
   - ipywidgets
-  - jupyter_contrib_nbextensions
-    #- git+https://github.com/SauceCat/PDPbox.git
-
+  - nbconvert
+  - PyHamcrest
